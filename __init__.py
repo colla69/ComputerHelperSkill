@@ -1,10 +1,12 @@
 import os
+from os.path import dirname
 
 from adapt.intent import IntentBuilder
 from mycroft.skills.core import MycroftSkill, intent_handler
 from mycroft.util.log import LOG
 from sqlalchemy import join
 
+__author__ = 'colla69'
 
 class ComputerHelperSkill(MycroftSkill):
 
