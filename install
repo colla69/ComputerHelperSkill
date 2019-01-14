@@ -1,0 +1,7 @@
+#!/bin/bash
+
+rm -rf /opt/mycroft/skills/ComputerHelperSkill.colla
+
+mkdir /opt/mycroft/skills/ComputerHelperSkill.colla
+
+cp -r ~/sandbox/ComputerHelperSkill/* /opt/mycroft/skills/ComputerHelperSkill.colla/
