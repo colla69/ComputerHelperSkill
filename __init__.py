@@ -1,10 +1,8 @@
 import os
-from os.path import dirname
-
+from os.path import dirname, join
 from adapt.intent import IntentBuilder
 from mycroft.skills.core import MycroftSkill, intent_handler
 from mycroft.util.log import LOG
-from sqlalchemy import join
 
 __author__ = 'colla69'
 
@@ -15,11 +13,13 @@ class ComputerHelperSkill(MycroftSkill):
         super(ComputerHelperSkill, self).__init__(name="TemplateSkill")
         # Initialize working variables used within the skill.
         self.dictation_words = []
-        self.read_vocab("UndoKeyword.voc")
+        self.read_vocab("browser.voc")
+        self.read_vocab("all.voc")
 
-    def read_vocab(self, name="DictationKeyword.voc"):
+    def read_vocab(self, name=""):
         path = join(dirname(__file__), "vocab", self.lang,
                     name)
+        LOG.info(path)
         with open(path, 'r') as voc_file:
             for line in voc_file.readlines():
                 parts = line.strip().split("|")
@@ -28,13 +28,13 @@ class ComputerHelperSkill(MycroftSkill):
                 for alias in parts[1:]:
                     self.dictation_words.append(alias)
 
-    @intent_handler(IntentBuilder("OpenerIntent").require("open"))
+    @intent_handler(IntentBuilder("OpenerIntent").require("OpenKeyword"))
     def handle_opener_intent(self, message):
         self.speak_dialog("choose.app", expect_response=True)
 
     @intent_handler(IntentBuilder("BrowserIntent").require("browser"))
-    def handle_opener_intent(self, message):
-        cmd = "google-chrome"
+    def handle_browser_intent(self, message):
+        cmd = "sensible-browser"
         execute(cmd)
 
     def check_for_intent(self, utterance):
@@ -46,10 +46,10 @@ class ComputerHelperSkill(MycroftSkill):
         return False
 
     def converse(self, utterances, lang="en-us"):
-        if self.check_for_intent(utterances[0]):
-            return True
-        else:
-            return False
+        return False
+
+    def stop(self):
+        pass
 
 
 def execute(cmd):
