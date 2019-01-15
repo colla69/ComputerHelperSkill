@@ -6,6 +6,12 @@ from mycroft.util.log import LOG
 
 __author__ = 'colla69'
 
+browserCMD = "sensible-browser"
+allCMD = "sensible-browser & skypeforlinux & whatsie &"
+pyCharmCMD = "env BAMF_DESKTOP_FILE_HINT=/var/lib/snapd/desktop/applications/pycharm-professional_pycharm-professional.desktop /snap/bin/pycharm-professional  &"
+ideaCMD = "env BAMF_DESKTOP_FILE_HINT=/var/lib/snapd/desktop/applications/intellij-idea-ultimate_intellij-idea-ultimate.desktop /snap/bin/intellij-idea-ultimate  &"
+raiunoCMD = "sensible-browser 'http://webtvhd.com/rai-uno-live.php' "
+
 class ComputerHelperSkill(MycroftSkill):
 
     # The constructor of the skill, which calls MycroftSkill's constructor
@@ -14,7 +20,10 @@ class ComputerHelperSkill(MycroftSkill):
         # Initialize working variables used within the skill.
         self.dictation_words = []
         self.read_vocab("browser.voc")
+        self.read_vocab("pycharm.voc")
         self.read_vocab("all.voc")
+        self.read_vocab("raiuno.voc")
+
 
     def read_vocab(self, name=""):
         path = join(dirname(__file__), "vocab", self.lang,
@@ -34,8 +43,23 @@ class ComputerHelperSkill(MycroftSkill):
 
     @intent_handler(IntentBuilder("BrowserIntent").require("browser"))
     def handle_browser_intent(self, message):
-        cmd = "sensible-browser"
-        execute(cmd)
+        execute(browserCMD)
+
+    @intent_handler(IntentBuilder("StackIntent").require("all"))
+    def handle_stack_intent(self, message):
+        execute(allCMD)
+
+    @intent_handler(IntentBuilder("PyCharmsIntent").require("pycharm"))
+    def handle_pycharms_intent(self, message):
+        execute(pycharmCMD)
+
+    @intent_handler(IntentBuilder("IdeaIntent").require("idea"))
+    def handle_idea_intent(self, message):
+        execute(ideaCMD)
+
+    @intent_handler(IntentBuilder("RaiUnoIntent").require("raiuno"))
+    def handle_raiuno_intent(self, message):
+        execute(raiunoCMD)
 
     def check_for_intent(self, utterance):
         # check if dictation intent will trigger
@@ -46,6 +70,9 @@ class ComputerHelperSkill(MycroftSkill):
         return False
 
     def converse(self, utterances, lang="en-us"):
+        # contains all triggerwords for second layer Intents
+        LOG.info(self.dictation_words)
+        ####
         return False
 
     def stop(self):
