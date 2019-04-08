@@ -36,12 +36,12 @@ class ComputerHelperSkill(MycroftSkill):
         self.read_vocab("pycharm.voc")
         self.read_vocab("all.voc")
         self.read_vocab("raiuno.voc")
+
+    def initialize(self):
         beamer_intent = IntentBuilder("BeamerIntent"). \
             require("BeamerKeyword").build()
         self.register_intent(beamer_intent,
                              self.handle_beamer_intent)
-
-    def initialize(self):
         table_intent = IntentBuilder("TableIntent"). \
             require("TableKeyword").build()
         self.register_intent(table_intent,
