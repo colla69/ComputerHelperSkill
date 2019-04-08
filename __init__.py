@@ -3,7 +3,7 @@ from os.path import dirname, join
 from adapt.intent import IntentBuilder
 from mycroft.skills.core import MycroftSkill, intent_handler
 from mycroft.util.log import LOG
-
+import pynput
 
 keyboard = pynput.keyboard.Controller()
 
