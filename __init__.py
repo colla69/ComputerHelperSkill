@@ -41,6 +41,7 @@ class ComputerHelperSkill(MycroftSkill):
         self.register_intent(beamer_intent,
                              self.handle_beamer_intent)
 
+    def initialize(self):
         table_intent = IntentBuilder("TableIntent"). \
             require("TableKeyword").build()
         self.register_intent(table_intent,
