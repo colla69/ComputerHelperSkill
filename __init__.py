@@ -72,21 +72,14 @@ class ComputerHelperSkill(MycroftSkill):
     # audio ducking
 
     def handle_listener_started(self, message):
-        #self.mixer.setvolume(10)
         vol = self.mixer.getvolume()[0]
-        print(vol)
-
-        # if self.get_running():
-        #   volume = self.player.get_media_player().audio_get_volume()
-        #   half = volume // 2
-        #   self.player.get_media_player().audio_set_volume(half)
+        vol = (vol//3)*2
+        self.mixer.setvolume(vol)
 
     def handle_listener_stopped(self, message):
-        pass
-        # if self.get_running():
-        #    volume = self.player.get_media_player().audio_get_volume()
-        #    doubleit = volume * 2
-        #    self.player.get_media_player().audio_set_volume(doubleit)
+        vol = self.mixer.getvolume()[0]
+        vol = (vol // 2) * 3
+        self.mixer.setvolume(vol)
 
     ######################################################################
     # intents
