@@ -5,6 +5,8 @@ from mycroft.skills.core import MycroftSkill, intent_handler
 from mycroft.util.log import LOG
 import pynput
 from alsaaudio import Mixer, mixers as alsa_mixers
+from mycroft.skills.audioservice import AudioService
+
 keyboard = pynput.keyboard.Controller()
 
 
@@ -33,21 +35,8 @@ class ComputerHelperSkill(MycroftSkill):
 
     def __init__(self):
         super(ComputerHelperSkill, self).__init__(name="TemplateSkill")
+        # self.audioservice = AudioService(self._bus)
         # Initialize working variables used within the skill.
-        self.dictation_words = []
-        try:
-            # If there are only 1 mixer use that one
-            mixers = alsa_mixers()
-            if len(mixers) == 1:
-                self.mixer = Mixer(mixers[0])
-            else:  # Try using the default mixer
-                self.mixer = Mixer()
-        except Exception:
-            # Retry instanciating the mixer
-            try:
-                self.mixer = Mixer()
-            except Exception as e:
-                self.log.error('Couldn\'t allocate mixer, {}'.format(repr(e)))
 
     def initialize(self):
         beamer_intent = IntentBuilder("BeamerIntent").require("BeamerKeyword").build()
@@ -56,30 +45,37 @@ class ComputerHelperSkill(MycroftSkill):
         self.register_intent(table_intent,self.handle_table_intent)
         self.add_event('recognizer_loop:record_begin', self.handle_listener_started)
         self.add_event('recognizer_loop:record_end', self.handle_listener_stopped)
+        # self.add_event('recognizer_loop:audio_output_start', self.handle_audio_start)
+        # self.add_event('recognizer_loop:audio_output_end', self.handle_audio_stop)
 
-    def read_vocab(self, name=""):
-        path = join(dirname(__file__), "vocab", self.lang, name)
-        LOG.info(path)
-        with open(path, 'r') as voc_file:
-            for line in voc_file.readlines():
-                parts = line.strip().split("|")
-                entity = parts[0]
-                self.dictation_words.append(entity)
-                for alias in parts[1:]:
-                    self.dictation_words.append(alias)
+        # self.audioservice.play("http://plex.colarietitosti.info:32400/library/parts/15480/1557728134/file.mp3?download=1&X-Plex-Token=y9pLd6uPWXpwbw14sRYf")
 
     ######################################################################
     # audio ducking
-
     def handle_listener_started(self, message):
-        vol = self.mixer.getvolume()[0]
+        vol = Mixer().getvolume()[0]
         vol = (vol//3)*2
-        self.mixer.setvolume(vol)
+        Mixer().setvolume(vol)
 
     def handle_listener_stopped(self, message):
-        vol = self.mixer.getvolume()[0]
+        vol = Mixer().getvolume()[0]
         vol = (vol // 2) * 3
-        self.mixer.setvolume(vol)
+        if vol > 100:
+            vol = 100
+        Mixer().setvolume(vol)
+
+    def handle_audio_start(self, event):
+        vol = Mixer().getvolume()[0]
+        vol = (vol // 3) * 2
+        Mixer().setvolume(vol)
+
+    def handle_audio_stop(self, event):
+        vol = Mixer().getvolume()[0]
+
+        vol = (vol // 2) * 3
+        if vol > 100:
+            vol = 100
+        Mixer().setvolume(vol)
 
     ######################################################################
     # intents
@@ -113,18 +109,8 @@ class ComputerHelperSkill(MycroftSkill):
         keyboard.press(pynput.keyboard.Key.f5)
         keyboard.release(pynput.keyboard.Key.f5)
 
-    def check_for_intent(self, utterance):
-        # check if dictation intent will trigger
-        # TODO use https://github.com/MycroftAI/mycroft-core/pull/1351
-        for word in self.dictation_words:
-            if word in utterance:
-                return True
-        return False
-
     def converse(self, utterances, lang="en-us"):
         # contains all triggerwords for second layer Intents
-        LOG.info(self.dictation_words)
-        ####
         return False
 
     def stop(self):
