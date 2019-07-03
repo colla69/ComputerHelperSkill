@@ -1,7 +1,6 @@
 import os
-from os.path import dirname, join
 from adapt.intent import IntentBuilder
-from mycroft.skills.core import MycroftSkill, intent_handler
+from mycroft.skills.core import MycroftSkill, intent_handler, intent_file_handler
 from mycroft.util.log import LOG
 import pynput
 from alsaaudio import Mixer, mixers as alsa_mixers
@@ -31,78 +30,88 @@ def table_screen():
               "--output HDMI-0 --off")
 
 
-class ComputerHelperSkill(MycroftSkill):
+def turn_off_screens():
+    os.system("xset dpms force off")
 
+
+class ComputerHelperSkill(MycroftSkill):
     def __init__(self):
         super(ComputerHelperSkill, self).__init__(name="TemplateSkill")
+        # mixers = alsa_mixers()
+        self.mixer = Mixer('Master')
         # self.audioservice = AudioService(self._bus)
         # Initialize working variables used within the skill.
 
     def initialize(self):
-        beamer_intent = IntentBuilder("BeamerIntent").require("BeamerKeyword").build()
-        self.register_intent(beamer_intent, self.handle_beamer_intent)
-        table_intent = IntentBuilder("TableIntent").require("TableKeyword").build()
-        self.register_intent(table_intent,self.handle_table_intent)
+        #beamer_intent = IntentBuilder("BeamerIntent").require("BeamerKeyword").build()
+        #self.register_intent(beamer_intent, self.handle_beamer_intent)
+        #table_intent = IntentBuilder("TableIntent").require("TableKeyword").build()
+        #self.register_intent(table_intent,self.handle_table_intent)
+
         self.add_event('recognizer_loop:record_begin', self.handle_listener_started)
         self.add_event('recognizer_loop:record_end', self.handle_listener_stopped)
+
         # self.add_event('recognizer_loop:audio_output_start', self.handle_audio_start)
         # self.add_event('recognizer_loop:audio_output_end', self.handle_audio_stop)
-
         # self.audioservice.play("http://plex.colarietitosti.info:32400/library/parts/15480/1557728134/file.mp3?download=1&X-Plex-Token=y9pLd6uPWXpwbw14sRYf")
 
     ######################################################################
     # audio ducking
     def handle_listener_started(self, message):
-        vol = Mixer().getvolume()[0]
+        vol = Mixer('Master').getvolume()[0]
         vol = (vol//3)*2
-        Mixer().setvolume(vol)
+        Mixer('Master').setvolume(vol)
 
     def handle_listener_stopped(self, message):
-        vol = Mixer().getvolume()[0]
+        vol = Mixer('Master').getvolume()[0]
         vol = (vol // 2) * 3
         if vol > 100:
             vol = 100
-        Mixer().setvolume(vol)
+        Mixer('Master').setvolume(vol)
 
     def handle_audio_start(self, event):
-        vol = Mixer().getvolume()[0]
+        vol = Mixer('Master').getvolume()[0]
         vol = (vol // 3) * 2
-        Mixer().setvolume(vol)
+        Mixer('Master').setvolume(vol)
 
     def handle_audio_stop(self, event):
-        vol = Mixer().getvolume()[0]
-
+        vol = Mixer('Master').getvolume()[0]
         vol = (vol // 2) * 3
         if vol > 100:
             vol = 100
-        Mixer().setvolume(vol)
+        Mixer('Master').setvolume(vol)
 
     ######################################################################
     # intents
+    """
+        def handle_beamer_intent(self, message):
+            beamer_screen()
+            self.speak_dialog("changes.done")
+    
+        def handle_table_intent(self, message):
+            table_screen()
+            self.speak_dialog("changes.done")
+    """
 
-    def handle_beamer_intent(self, message):
-        beamer_screen()
-        self.speak_dialog("changes.done")
-
-    def handle_table_intent(self, message):
-        table_screen()
-        self.speak_dialog("changes.done")
+    @intent_file_handler("turn.off.screens.intent")
+    def handle_night_intent(self, message):
+        turn_off_screens()
 
     @intent_handler(IntentBuilder("BrowserIntent").require("browser"))
     def handle_browser_intent(self, message):
-        execute(browserCMD)
+        os.system(browserCMD)
 
     @intent_handler(IntentBuilder("StackIntent").require("all"))
     def handle_stack_intent(self, message):
-        execute(allCMD)
+        os.system(allCMD)
 
     @intent_handler(IntentBuilder("PyCharmsIntent").require("open").require("pycharm"))
     def handle_pycharms_intent(self, message):
-        execute(pyCharmCMD)
+        os.system(pyCharmCMD)
 
     @intent_handler(IntentBuilder("IdeaIntent").require("idea"))
     def handle_idea_intent(self, message):
-        execute(ideaCMD)
+        os.system(ideaCMD)
 
     @intent_handler(IntentBuilder("RefreshIntent").require("refresh"))
     def handle_refresh_intent(self, message):
@@ -116,9 +125,6 @@ class ComputerHelperSkill(MycroftSkill):
     def stop(self):
         pass
 
-
-def execute(cmd):
-    os.system(cmd)
 
 
 def create_skill():
