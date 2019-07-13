@@ -2,18 +2,15 @@ To submit your skill, replace this file with text from
 https://rawgit.com/MycroftAI/mycroft-skills/master/meta_editor.html
 
 
-## YOUR SKILL NAME
-One line description of the skill
+## Computer Helper Skill
+This skill contains intents to help me, in my day to day work
 
 ## Description 
-A more verbose description, including any extra instructions or
-information that didn't fit in the one line.
+You can use this skill as an example to what you can do .. basically anything you can do in python on your pc can also be used with speech commands. This is my own playground :)
 
 ## Examples 
-* "Hello world"
-* "Greetings planet earth"
-* "Count up"
-* "Count down"
+* "Hey Mycroft, open chrome" > open a new browser window
+* "Hey Mycroft, good night" > turns off the computer screen
 
 ## Credits 
-Your name
+colla69
