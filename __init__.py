@@ -6,6 +6,7 @@ import pynput
 from alsaaudio import Mixer, mixers as alsa_mixers
 from mycroft.skills.audioservice import AudioService
 
+
 keyboard = pynput.keyboard.Controller()
 
 
@@ -19,6 +20,10 @@ pyCharmCMD = "env BAMF_DESKTOP_FILE_HINT=/var/lib/snapd/desktop/applications/pyc
 ideaCMD = "env BAMF_DESKTOP_FILE_HINT=/var/lib/snapd/desktop/applications/intellij-idea-ultimate_intellij-idea" \
           "-ultimate.desktop /snap/bin/intellij-idea-ultimate  & "
 raiunoCMD = "firefox 'http://webtvhd.com/rai-uno-live.php' "
+xf86_play = 269025044
+xf86_stop = 269025045
+xf86_prev = 269025046
+xf86_next = 269025047
 
 
 def beamer_screen():
@@ -38,7 +43,7 @@ class ComputerHelperSkill(MycroftSkill):
     def __init__(self):
         super(ComputerHelperSkill, self).__init__(name="TemplateSkill")
         # mixers = alsa_mixers()
-        self.mixer = Mixer('Master')
+        # self.mixer = Mixer('Master')
         # self.audioservice = AudioService(self._bus)
         # Initialize working variables used within the skill.
 
@@ -112,6 +117,12 @@ class ComputerHelperSkill(MycroftSkill):
     @intent_handler(IntentBuilder("IdeaIntent").require("idea"))
     def handle_idea_intent(self, message):
         os.system(ideaCMD)
+
+    @intent_handler(IntentBuilder("PauseMediaIntent").require("pause.media"))
+    def handle_pause_media_intent(self, message):
+        key = pynput.keyboard.KeyCode.from_vk(xf86_play)
+        keyboard.press(key)
+        keyboard.release(key)
 
     @intent_handler(IntentBuilder("RefreshIntent").require("refresh"))
     def handle_refresh_intent(self, message):
