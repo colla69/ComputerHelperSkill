@@ -98,7 +98,7 @@ class ComputerHelperSkill(MycroftSkill):
             self.speak_dialog("changes.done")
     """
 
-    @intent_file_handler("turn.off.screens.intent")
+    @intent_handler(IntentBuilder("TurnOffScreens").require("turn.off.screens"))
     def handle_night_intent(self, message):
         turn_off_screens()
 
