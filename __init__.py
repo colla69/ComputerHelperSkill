@@ -36,7 +36,7 @@ def table_screen():
 
 
 def turn_off_screens():
-    os.system("xset dpms force off")
+    os.system("systemctl suspend")
 
 
 class ComputerHelperSkill(MycroftSkill):
